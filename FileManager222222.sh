@@ -11,7 +11,7 @@ addDir() {
         exit 1
     fi
 
-    mkdir -p "$path/$name" 2>/dev/null
+    mkdir -p "$path/$name" 
     if [ $? -eq 0 ]; then
         echo " Directory created: $path/$name"
     else
@@ -27,7 +27,7 @@ deleteDir() {
     fi
 
     if [ -d "$path/$name" ]; then
-        rmdir "$path/$name" 2>/dev/null
+        rmdir "$path/$name" 
         if [ $? -eq 0 ]; then
             echo " Directory deleted: $path/$name"
         else
@@ -62,7 +62,7 @@ listDirs() {
 
     if [ -d "$path" ]; then
         echo " Directories in $path:"
-        ls -d "$path"/*/ 2>/dev/null || echo "No directories found."
+        ls -d "$path"/*/ || echo "No directories found."
     else
         echo " Path does not exist: $path"
     fi
