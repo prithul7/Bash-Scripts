@@ -5,47 +5,100 @@ path=$2
 name=$3
 
 addDir() {
-    mkdir -p "$path/$name"
-    echo "Directory created: $path/$name"
+    if [ -z "$path" ] || [ -z "$name" ]; then
+        echo " Path or directory name missing!"
+        echo "Usage: $0 addDir <path> <dirname>"
+        exit 1
+    fi
+
+    mkdir -p "$path/$name" 2>/dev/null
+    if [ $? -eq 0 ]; then
+        echo " Directory created: $path/$name"
+    else
+        echo " Failed to create directory: $path/$name"
+    fi
 }
 
 deleteDir() {
-    rmdir "$path/$name"
+    if [ -z "$path" ] || [ -z "$name" ]; then
+        echo " Path or directory name missing!"
+        echo "Usage: $0 deleteDir <path> <dirname>"
+        exit 1
+    fi
+
+    if [ -d "$path/$name" ]; then
+        rmdir "$path/$name" 2>/dev/null
+        if [ $? -eq 0 ]; then
+            echo " Directory deleted: $path/$name"
+        else
+            echo " Failed to delete directory (not empty?): $path/$name"
+        fi
+    else
+        echo " Directory does not exist: $path/$name"
+    fi
 }
 
 listFiles() {
-    ls -p "$path" | grep -v /
+    if [ -z "$path" ]; then
+        echo " Path missing!"
+        echo "Usage: $0 listFiles <path>"
+        exit 1
+    fi
+
+    if [ -d "$path" ]; then
+        echo " Files in $path:"
+        ls -p "$path" | grep -v / || echo "No files found."
+    else
+        echo " Path does not exist: $path"
+    fi
 }
 
 listDirs() {
-    ls -d "$path"/*/
+    if [ -z "$path" ]; then
+        echo " Path missing!"
+        echo "Usage: $0 listDirs <path>"
+        exit 1
+    fi
+
+    if [ -d "$path" ]; then
+        echo " Directories in $path:"
+        ls -d "$path"/*/ 2>/dev/null || echo "No directories found."
+    else
+        echo " Path does not exist: $path"
+    fi
 }
 
 listAll() {
-    ls "$path"
+    if [ -z "$path" ]; then
+        echo " Path missing!"
+        echo "Usage: $0 listAll <path>"
+        exit 1
+    fi
+
+    if [ -d "$path" ]; then
+        echo " Contents of $path:"
+        ls "$path" || echo "Empty directory."
+    else
+        echo " Path does not exist: $path"
+    fi
 }
 
 usage() {
-    echo "Invalid command!"
+    echo " Invalid command!"
     echo "Usage:"
     echo "$0 addDir <path> <dirname>"
     echo "$0 deleteDir <path> <dirname>"
     echo "$0 listFiles <path>"
     echo "$0 listDirs <path>"
     echo "$0 listAll <path>"
+    exit 1
 }
-
-if [ "$cmd" = "addDir" ]; then
-    addDir
-elif [ "$cmd" = "deleteDir" ]; then
-    deleteDir
-elif [ "$cmd" = "listFiles" ]; then
-    listFiles
-elif [ "$cmd" = "listDirs" ]; then
-    listDirs
-elif [ "$cmd" = "listAll" ]; then
-    listAll
-else
-    usage
-fi
+case "$cmd" in
+    addDir) addDir ;;
+    deleteDir) deleteDir ;;
+    listFiles) listFiles ;;
+    listDirs) listDirs ;;
+    listAll) listAll ;;
+    *) usage ;;
+esac
 
